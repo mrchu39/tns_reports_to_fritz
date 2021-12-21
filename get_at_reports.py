@@ -5,10 +5,10 @@ import json
 import simplejson
 import datetime
 
-TNS_API_KEY = ''
-YOUR_BOT_ID = ''
-YOUR_BOT_NAME = ""
-FRITZ_TOKEN = ''
+TNS_API_KEY = '54916f1700966b3bd325fc1189763d86512bda1d'
+YOUR_BOT_ID = '48869'
+YOUR_BOT_NAME = "ZTF_Bot1"
+FRITZ_TOKEN = 'a5ffd9e6-8263-454b-9ec0-d36911df297d'
 
 def hms2deg(num):
     return float(num.split(':')[0])*360./24 + float(num.split(':')[1])*360./(24*60) + float(num.split(':')[2])*360./(24*60*60)
@@ -68,9 +68,14 @@ def submit_tns_alerts(days_since=1):
             try:
                 response = requests.post('https://fritz.science/api/candidates', headers=headers, data=json.dumps(data))
 
-                if json.loads(response.text)['status'] == 'error' and 'duplicate key value violates unique constraint' not in json.loads(response.text)['message']:
-                    print(str(datetime.datetime.utcnow()) + ': Submission failed. Error: ' + print(json.loads(response.text)['message']))
+                if json.loads(response.text)['status'] == 'error':
+                    if 'duplicate key value violates unique constraint' in json.loads(response.text)['message']:
+                        print(str(datetime.datetime.utcnow()) + ': ' + obj_df['Internal Name'][o] + ' has already been uploaded to Fritz.')
 
+                        return
+
+                    print(str(datetime.datetime.utcnow()) + ': Submission failed. Error: ' + json.loads(response.text)['message'])
+		    
                     return
 
                 print(str(datetime.datetime.utcnow()) + ': Submission of ' + obj_df['Internal Name'][o] + ' succeeded.')
